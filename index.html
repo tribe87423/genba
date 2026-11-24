@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>現場管理</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="現場管理">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#EEF2F6">
+<meta name="referrer" content="no-referrer">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<style>
+html,body{margin:0;height:100%;background:#EEF2F6;font-family:system-ui,sans-serif}
+iframe{position:fixed;inset:0;width:100%;height:100%;border:0;padding-top:env(safe-area-inset-top);box-sizing:border-box;background:#EEF2F6}
+#msg{display:none;padding:40px 20px;text-align:center;color:#334;line-height:1.8}
+#load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#667;font-size:15px}
+</style>
+</head>
+<body>
+<div id="load">読み込み中…</div>
+<div id="msg">このページは、LINEの「メニュー」から届いたリンクで開いてください。</div>
+<script>
+(function(){
+  var EXEC = "https://script.google.com/macros/s/AKfycbxwkcXpKVnnYRiQjNHNK8OiXBcm9N00EpUlX4wFwLa_8bhdpH9n1ybd1EWy6zzs5DgE/exec";
+  function get(s, n){ var m = new RegExp('[#?&]' + n + '=([^&]+)').exec(s); return m ? decodeURIComponent(m[1]) : ''; }
+  var k = get(location.hash, 'k') || get(location.search, 'k');
+  if (!k) { try { k = localStorage.getItem('genba_k') || ''; } catch (e) {} }
+  if (!k) { document.getElementById('load').style.display = 'none'; document.getElementById('msg').style.display = 'block'; return; }
+  try { localStorage.setItem('genba_k', k); } catch (e) {}
+  if (location.hash.indexOf('k=') < 0 || location.search) history.replaceState(null, '', location.pathname + '#k=' + encodeURIComponent(k));
+  var f = document.createElement('iframe');
+  f.src = EXEC + '?k=' + encodeURIComponent(k);
+  f.setAttribute('allow', 'clipboard-write; geolocation; camera');
+  f.onload = function(){ document.getElementById('load').style.display = 'none'; };
+  document.body.appendChild(f);
+})();
+</script>
+</body>
+</html>
