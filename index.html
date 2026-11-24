@@ -21,7 +21,7 @@
 <script>
 (function () {
   var EXEC = "https://script.google.com/macros/s/AKfycbxwkcXpKVnnYRiQjNHNK8OiXBcm9N00EpUlX4wFwLa_8bhdpH9n1ybd1EWy6zzs5DgE/exec";
-  var HK = 'genba_html_v1';
+  var HK = 'genba_html_v2';
   // 画面の元はグーグル側にある。一度読んだら覚えておき、次からはすぐ出して、裏で新しいものに入れ替えておく
   function build(raw) {
     var keyCode = "var KEY = (function () {" +
@@ -37,7 +37,12 @@
       '<script>window.GENBA_EXEC = "' + EXEC + '";<\/script>';
     return raw.replace(/var KEY = <\?!=[^\n]*\?>;/, function () { return keyCode; }).replace('<head>', function () { return head; });
   }
-  function show(raw) { var h = build(raw); document.open(); document.write(h); document.close(); }
+  function show(raw) {
+    // 読み込みが終わってから丸ごと入れ替える（途中で入れ替えると「読み込み中…」が残る）
+    var go = function () { var h = build(raw); document.open(); document.write(h); document.close(); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(go, 0); });
+    else setTimeout(go, 0);
+  }
   function getRaw() { return fetch(EXEC + '?raw=index', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (t) { if (t.indexOf('var KEY') < 0) throw new Error('bad'); return t; }); }
   var cached = null;
   try { cached = localStorage.getItem(HK); } catch (e) {}
